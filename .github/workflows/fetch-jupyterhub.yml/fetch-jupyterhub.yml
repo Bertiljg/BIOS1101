@@ -1,0 +1,38 @@
+name: Fetch new weeks from JupyterHub
+
+on:
+  schedule:
+    - cron: "0 5 * * *"     # every day at 05:00 UTC (06:00/07:00 in Norway)
+  workflow_dispatch:         # adds a "Run workflow" button on the Actions tab
+
+permissions:
+  contents: write            # lets the job commit and push
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install requests truststore
+
+      - name: Fetch new week folders
+        env:
+          JUPYTERHUB_TOKEN: ${{ secrets.JUPYTERHUB_TOKEN }}
+        run: python tools/fetch_jupyterhub.py
+
+      - name: Commit and push if anything arrived
+        run: |
+          git add "JupyterHub Download - BIOS1101"
+          if git diff --cached --quiet; then
+            echo "No new files."
+            exit 0
+          fi
+          git config user.name "jupyterhub-fetch"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Hentet nye uker fra JupyterHub"
+          git push

@@ -16,3 +16,7 @@ pandas-stubs
 
 # Possibly installed by mistake. Remove if no notebook imports it.
 latex
+
+# Used by tools/fetch_jupyterhub.py
+requests
+truststore
