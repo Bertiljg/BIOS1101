@@ -1,5 +1,0 @@
-Month,Rainfall
-Average,19.3
-June,20.0
-July,10.5
-August,27.5
