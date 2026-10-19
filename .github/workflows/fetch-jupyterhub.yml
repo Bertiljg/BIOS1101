@@ -12,13 +12,25 @@ jobs:
   fetch:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
       - run: pip install requests truststore
+
+      # jupyterhub.uio.no doesn't send its intermediate certificate. Browsers and
+      # Windows fetch it automatically; Linux doesn't, so download it and trust it here.
+      - name: Add the hub's intermediate certificate
+        run: |
+          url=$(echo | openssl s_client -connect jupyterhub.uio.no:443 -servername jupyterhub.uio.no 2>/dev/null \
+                | openssl x509 -noout -ext authorityInfoAccess | grep -oP 'CA Issuers - URI:\K\S+')
+          echo "Intermediate certificate: $url"
+          curl -fsSL "$url" -o /tmp/inter.crt
+          openssl x509 -inform DER -in /tmp/inter.crt -out /tmp/inter.pem 2>/dev/null || cp /tmp/inter.crt /tmp/inter.pem
+          sudo cp /tmp/inter.pem /usr/local/share/ca-certificates/uio-intermediate.crt
+          sudo update-ca-certificates
 
       - name: Fetch new week folders
         env:

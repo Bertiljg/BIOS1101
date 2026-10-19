@@ -44,18 +44,20 @@ WEEK_PATTERN = re.compile(r"^uke[\s_-]*\d{1,2}$", re.IGNORECASE)
 MAX_FILE_MB = 95
 # ---------------------------------------------------------------------------
 
-TOKEN = os.environ.get("JUPYTERHUB_TOKEN")
-if not TOKEN:
-    sys.exit("JUPYTERHUB_TOKEN is not set. See the top of this file.")
-
 session = requests.Session()
-session.headers["Authorization"] = f"token {TOKEN}"
 
 
 def fail(msg):
     # GitHub Actions shows lines starting with ::error:: as a red error.
     print(f"::error::{msg}" if os.environ.get("GITHUB_ACTIONS") else f"ERROR: {msg}")
     sys.exit(1)
+
+
+TOKEN = os.environ.get("JUPYTERHUB_TOKEN")
+if not TOKEN:
+    fail("JUPYTERHUB_TOKEN is not set. Locally: see the top of this file. "
+         "On GitHub: add it under Settings -> Secrets and variables -> Actions.")
+session.headers["Authorization"] = f"token {TOKEN}"
 
 
 def hub_user():
