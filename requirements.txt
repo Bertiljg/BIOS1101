@@ -1,0 +1,18 @@
+# BIOS1101 environment (built with Python 3.14)
+
+# Science and data
+numpy
+pandas
+scipy
+matplotlib
+openpyxl          # reading/writing Excel files with pandas
+
+# Notebooks
+jupyter
+ipywidgets
+
+# Editor support (better autocomplete for pandas in PyCharm)
+pandas-stubs
+
+# Possibly installed by mistake. Remove if no notebook imports it.
+latex
